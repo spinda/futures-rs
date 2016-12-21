@@ -19,6 +19,7 @@ log = { version = "0.3", default-features = false }
 [features]
 use_std = []
 with-deprecated = []
+never_type = []
 default = ["use_std", "with-deprecated"]
 
 [workspace]

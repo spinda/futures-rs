@@ -152,6 +152,8 @@
 #![deny(missing_docs)]
 #![doc(html_root_url = "https://docs.rs/futures/0.1")]
 
+#![cfg_attr(feature = "never_type", feature(never_type))]
+
 #[macro_use]
 #[cfg(feature = "use_std")]
 extern crate std;

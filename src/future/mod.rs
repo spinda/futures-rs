@@ -818,6 +818,16 @@ impl<'a, F: ?Sized + Future> Future for &'a mut F {
     }
 }
 
+#[cfg(feature = "never_type")]
+impl Future for ! {
+    type Item = !;
+    type Error = !;
+
+    fn poll(&mut self) -> Poll<Self::Item, Self::Error> {
+        match self {}
+    }
+}
+
 // Just a helper function to ensure the futures we're returning all have the
 // right implementations.
 fn assert_future<A, B, F>(t: F) -> F
