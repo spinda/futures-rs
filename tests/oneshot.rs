@@ -91,6 +91,16 @@ fn close_wakes() {
 }
 
 #[test]
+fn send_multiple_times() {
+    let (tx, mut rx) = channel::<u32>();
+    assert!(tx.send(42).is_ok());
+    assert!(tx.send(24).is_err());
+    assert!(tx.send(78).is_err());
+    assert_eq!(rx.poll(), Ok(Async::Ready(42)));
+    assert!(rx.poll().is_err());
+}
+
+#[test]
 fn clone_sender() {
     {
         let (tx, mut rx) = channel::<u32>();

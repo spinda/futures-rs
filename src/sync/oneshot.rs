@@ -297,25 +297,38 @@ impl<T> Sender<T> {
         self.inner.send(t)
     }
 
+    /// Attempts to send a value to the oneshot receiver.
+    ///
+    /// This function will indicate to the other end, the `Receiver`, that the
+    /// value provided is the result of the computation this represents.
+    ///
+    /// If the value is successfully enqueued for the remote end to receive,
+    /// then `Ok(())` is returned. However, if the receiving end was deallocated
+    /// before this function was called, or if it was already sent a value, then
+    /// `Err` is returned with the value provided.
+    pub fn try_send(&self, t: T) -> Result<(), T> {
+        self.inner.send(t)
+    }
+
     /// Polls this `Sender` half to detect whether the `Receiver` this has
-    /// paired with has gone away.
+    /// paired with is unavailable.
     ///
     /// This function can be used to learn about when the `Receiver` (consumer)
-    /// half has gone away and nothing will be able to receive a message sent
-    /// from `complete`.
+    /// half has either gone away or already received a value, and thus nothing
+    /// will be able to receive a message sent from this sender.
     ///
     /// Like `Future::poll`, this function will panic if it's not called from
     /// within the context of a task. In otherwords, this should only ever be
     /// called from inside another future.
     ///
-    /// If `Ready` is returned then it means that the `Receiver` has disappeared
+    /// If `Ready` is returned then it means that the `Receiver` is unavailable
     /// and the result this `Sender` would otherwise produce should no longer
     /// be produced.
     ///
-    /// If `NotReady` is returned then the `Receiver` is still alive and may be
-    /// able to receive a message if sent. The current task, however, is
-    /// scheduled to receive a notification if the corresponding `Receiver` goes
-    /// away.
+    /// If `NotReady` is returned then the `Receiver` is still available and may
+    /// be able to receive a message if sent. The current task, however, is
+    /// scheduled to receive a notification if the corresponding `Receiver`
+    /// becomes unavailable.
     pub fn poll_cancel(&mut self) -> Poll<(), ()> {
         self.inner.poll_cancel()
     }
